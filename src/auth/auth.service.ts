@@ -18,7 +18,7 @@ export class AuthService {
         try {
             const  hash = await argon.hash(dto.password)
 
-            const user = await this.pg.query('insert into users (username, password ) values ($1, $2) returning *',[dto.username, dto.password])
+            const user = await this.pg.query('insert into users (username, password ) values ($1, $2) returning *',[dto.username, hash])
             
             return await this.signToken(user[0].user_id, user[0].username)
         } catch (error) {
@@ -31,9 +31,9 @@ export class AuthService {
             const user = await this.pg.query('select * from users where username = $1 and password = $2',[dto.username, dto.password])
             if(!user) throw new ForbiddenException("User not found");
 
-            // const password = await argon.verify(user.password, dto.password);
+            const password = await argon.verify(user.password, dto.password);
 
-            // if(!password) throw new UnauthorizedException("Wrong password");
+            if(!password) throw new UnauthorizedException("Wrong password");
 
             return await this.signToken(user[0].user_id, user[0].username)
        } catch (error) {
