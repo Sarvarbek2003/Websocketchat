@@ -1,4 +1,4 @@
-import { Injectable, Inject,ForbiddenException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Inject,ForbiddenException, UnauthorizedException, UseInterceptors } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from "@nestjs/config";
 import { AuthDto } from 'src/dto/auth.dto';
@@ -28,10 +28,10 @@ export class AuthService {
 
     async login(dto: AuthDto):Promise<any>{
         try {
-            const user = await this.pg.query('select * from users where username = $1 and password = $2',[dto.username, dto.password])
-            if(!user) throw new ForbiddenException("User not found");
+            const user = await this.pg.query('select * from users where username = $1 ',[dto.username])
+            if(!user.length) throw new ForbiddenException("User not found");
 
-            const password = await argon.verify(user.password, dto.password);
+            const password = await argon.verify(user[0].password, dto.password);
 
             if(!password) throw new UnauthorizedException("Wrong password");
 

@@ -1,4 +1,4 @@
-let backendApi = 'http://localhost:3000'
+let backendApi = 'http://xostlive.uz:7777'
 
 async function req (path, method, body) {
 
