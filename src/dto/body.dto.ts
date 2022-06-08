@@ -4,6 +4,9 @@ export class BodyDto {
   @IsEmpty()
   @IsInt()
   from_user_id: number
+
+  @IsEmpty()
+  @IsInt()
   to_user_id: number
 
   @IsString()

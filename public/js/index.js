@@ -1,13 +1,13 @@
 import { io } from "https://cdn.socket.io/4.3.2/socket.io.esm.min.js"
-const host = 'http://localhost:3000'
+const host = 'http://xostlive.uz:7777'
 
 const btn = document.querySelector('.reply-send')
 const usersList = document.querySelector('.sideBar')
 
 const socket = io(host)
 
-const userId = window.localStorage.getItem('userId')
-const to_user = window.localStorage.getItem('to_user')
+let userId = window.localStorage.getItem('userId')
+let to_user = window.localStorage.getItem('to_user')
 
 if( userId ) socket.emit('connection', userId)
 else window.location = '/auth/login'
@@ -25,6 +25,7 @@ btn.addEventListener('click', el => {
         to_user_id: to_user,
         message: comment.value
     }
+	console.log(obj)
     comment.value = null
     socket.emit('msgToServer', obj)
 }) 
@@ -56,6 +57,10 @@ const userRender = (users) => {
           usersList.append(divv)
           divv.onclick = () => {
               document.querySelector('.heading-name-meta').textContent = user.username
+	      let input = document.querySelector('#comment')
+	      to_user = user.user_id
+              window.localStorage.setItem('to_user', to_user)
+              input.removeAttribute('disabled', 'disabled')
               MyChatrRender(user.user_id)
           }
     
@@ -106,6 +111,7 @@ const MyChatrRender = async(to_userId) => {
 
 socket.on('message:ToClient', msg => {
     if(!msg.length) return
+	if(msg[0].from_user_id == to_user || msg[0].from_user_id == userId) {
         const [div] = createElements('div')
         if(msg[0].from_user_id == userId){
             div.setAttribute('class','row message-body')
@@ -135,6 +141,7 @@ socket.on('message:ToClient', msg => {
             </div>`
         }
         conversation.append(div)
+	}
 })
 
 socket.on('online', msg => {

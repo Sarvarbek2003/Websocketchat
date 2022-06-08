@@ -16,9 +16,9 @@ async function req (path, method, body) {
         body: (body instanceof FormData) ? body : JSON.stringify(body)
     })
     
-    if(response){
+    if(response.status == 201){
         return await response.json();
-    }
+    } else if(response.status == 401) window.location = '/auth/login'
     return response
 }
 
